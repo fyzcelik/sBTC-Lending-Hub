@@ -1,3 +1,4 @@
+;; === sBTC Lending Hub Contract ===
 (define-fungible-token stx-token)
 
 (define-map loans
@@ -10,13 +11,9 @@
 
 (define-public (borrow (amount uint))
   (begin
-    ;; Require a small fixed collateral for demo
     (asserts! (>= (stx-get-balance tx-sender) MIN_COLLATERAL) ERR_NOT_ENOUGH_COLLATERAL)
-    (map-set loans
-      ((borrower tx-sender))
-      ((amount amount))
-    )
-    (ok (ft-mint? stx-token amount tx-sender))
+    (map-set loans ((borrower tx-sender)) ((amount amount)))
+    (ft-mint? stx-token amount tx-sender)
   )
 )
 

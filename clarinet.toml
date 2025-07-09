@@ -1,0 +1,5 @@
+[project]
+name = "lending-pool"
+
+[contracts.lending-pool]
+path = "contracts/lending-pool.clar"
