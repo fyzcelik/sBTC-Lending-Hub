@@ -1,43 +1,72 @@
 import { useState } from 'react'
-import { openContractCall, userSession } from '@stacks/connect'
+import { openContractCall } from '@stacks/connect'
 import { StacksTestnet } from '@stacks/network'
 import { stringUtf8CV, uintCV } from '@stacks/transactions'
+import { CONTRACT_ADDRESS, CONTRACT_NAME } from '../lib/constants'
 
 export default function Home() {
-  const [txId, setTxId] = useState('')
+  const [uri, setUri] = useState('')
+  const [tokenId, setTokenId] = useState('')
+  const [price, setPrice] = useState('')
 
-  const handleBorrow = async () => {
-    const options = {
-      contractAddress: 'YOUR_CONTRACT_ADDRESS',
-      contractName: 'lending-pool',
-      functionName: 'borrow',
-      functionArgs: [uintCV(100)],
+  const handleMint = async () => {
+    await openContractCall({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+      functionName: 'mint',
+      functionArgs: [stringUtf8CV(uri)],
       network: new StacksTestnet(),
       appDetails: {
-        name: 'sBTC Lending Hub',
-        icon: window.location.origin + '/favicon.ico',
+        name: 'NFT Marketplace',
+        icon: '',
       },
-      onFinish: data => {
-        setTxId(data.txId)
-      },
-    }
-    await openContractCall(options)
+    })
+  }
+
+  const handleList = async () => {
+    await openContractCall({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+      functionName: 'list',
+      functionArgs: [uintCV(Number(tokenId)), uintCV(Number(price))],
+      network: new StacksTestnet(),
+      appDetails: { name: 'NFT Marketplace', icon: '' },
+    })
   }
 
   return (
-    <main className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-3xl font-bold mb-6">💰 sBTC Lending Demo</h1>
-      <button
-        onClick={handleBorrow}
-        className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        Borrow 100 STX (Mock)
-      </button>
-      {txId && (
-        <p className="mt-4 text-sm text-green-600">
-          Transaction submitted! TXID: <br /> {txId}
-        </p>
-      )}
+    <main className="p-10 space-y-6">
+      <h1 className="text-3xl font-bold">🖼️ NFT Marketplace (Testnet)</h1>
+
+      <div className="space-y-3">
+        <input
+          className="border p-2 w-full"
+          placeholder="NFT Metadata URI"
+          value={uri}
+          onChange={(e) => setUri(e.target.value)}
+        />
+        <button onClick={handleMint} className="bg-blue-600 text-white px-4 py-2 rounded">
+          Mint NFT
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <input
+          className="border p-2 w-full"
+          placeholder="Token ID"
+          value={tokenId}
+          onChange={(e) => setTokenId(e.target.value)}
+        />
+        <input
+          className="border p-2 w-full"
+          placeholder="Listing Price (in microSTX)"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <button onClick={handleList} className="bg-green-600 text-white px-4 py-2 rounded">
+          List for Sale
+        </button>
+      </div>
     </main>
   )
 }
