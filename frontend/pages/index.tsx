@@ -1,70 +1,66 @@
 import { useState } from 'react'
 import { openContractCall } from '@stacks/connect'
 import { StacksTestnet } from '@stacks/network'
-import { stringUtf8CV, uintCV } from '@stacks/transactions'
+import { uintCV } from '@stacks/transactions'
 import { CONTRACT_ADDRESS, CONTRACT_NAME } from '../lib/constants'
 
 export default function Home() {
-  const [uri, setUri] = useState('')
-  const [tokenId, setTokenId] = useState('')
-  const [price, setPrice] = useState('')
+  const [amount, setAmount] = useState('')
+  const [repayAmount, setRepayAmount] = useState('')
 
-  const handleMint = async () => {
+  const handleBorrow = async () => {
     await openContractCall({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
-      functionName: 'mint',
-      functionArgs: [stringUtf8CV(uri)],
+      functionName: 'borrow',
+      functionArgs: [uintCV(Number(amount))],
       network: new StacksTestnet(),
       appDetails: {
-        name: 'NFT Marketplace',
+        name: 'sBTC Lending Hub',
         icon: '',
       },
     })
   }
 
-  const handleList = async () => {
+  const handleRepay = async () => {
     await openContractCall({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
-      functionName: 'list',
-      functionArgs: [uintCV(Number(tokenId)), uintCV(Number(price))],
+      functionName: 'repay',
+      functionArgs: [uintCV(Number(repayAmount))],
       network: new StacksTestnet(),
-      appDetails: { name: 'NFT Marketplace', icon: '' },
+      appDetails: {
+        name: 'sBTC Lending Hub',
+        icon: '',
+      },
     })
   }
 
   return (
     <main className="p-10 space-y-6">
-      <h1 className="text-3xl font-bold">🖼️ NFT Marketplace (Testnet)</h1>
+      <h1 className="text-3xl font-bold">💰 sBTC Lending Hub (Testnet)</h1>
 
       <div className="space-y-3">
         <input
           className="border p-2 w-full"
-          placeholder="NFT Metadata URI"
-          value={uri}
-          onChange={(e) => setUri(e.target.value)}
+          placeholder="Borrow Amount (STX)"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
         />
-        <button onClick={handleMint} className="bg-blue-600 text-white px-4 py-2 rounded">
-          Mint NFT
+        <button onClick={handleBorrow} className="bg-blue-600 text-white px-4 py-2 rounded">
+          Borrow STX
         </button>
       </div>
 
       <div className="space-y-3">
         <input
           className="border p-2 w-full"
-          placeholder="Token ID"
-          value={tokenId}
-          onChange={(e) => setTokenId(e.target.value)}
+          placeholder="Repay Amount (STX)"
+          value={repayAmount}
+          onChange={(e) => setRepayAmount(e.target.value)}
         />
-        <input
-          className="border p-2 w-full"
-          placeholder="Listing Price (in microSTX)"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-        <button onClick={handleList} className="bg-green-600 text-white px-4 py-2 rounded">
-          List for Sale
+        <button onClick={handleRepay} className="bg-green-600 text-white px-4 py-2 rounded">
+          Repay Loan
         </button>
       </div>
     </main>
